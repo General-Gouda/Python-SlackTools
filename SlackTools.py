@@ -1,6 +1,6 @@
-import requests
-
 class SlackClient:
+    import requests
+
     def __init__(self, urlWithAccessToken):
         self._uri = urlWithAccessToken
 
@@ -9,17 +9,7 @@ class SlackClient:
             if "__dict__" in dir(attachments):
                 attachments = vars(attachments)
 
-        if username and attachments is not None:
-            slack_message = {
-                "attachments": [attachments],
-                "username": username
-            }
-
-            if (self.Send_to_Slack(slack_message)):
-                return True
-            else:
-                return False
-        elif channel and text and username and attachments is not None:
+        if channel and text and username and attachments is not None:
             slack_message = {
                 "channel": channel,
                 "text": text,
@@ -31,9 +21,20 @@ class SlackClient:
                 return True
             else:
                 return False
-        elif text and username is not None:
+        elif username and attachments and channel is not None:
             slack_message = {
-                "text": text,
+                "channel": channel,
+                "username": username,
+                "attachments": [attachments]
+            }
+
+            if (self.Send_to_Slack(slack_message)):
+                return True
+            else:
+                return False
+        elif username and attachments is not None:
+            slack_message = {
+                "attachments": [attachments],
                 "username": username
             }
 
@@ -52,6 +53,16 @@ class SlackClient:
                 return True
             else:
                 return False
+        elif text and username is not None:
+            slack_message = {
+                "text": text,
+                "username": username
+            }
+
+            if (self.Send_to_Slack(slack_message)):
+                return True
+            else:
+                return False
         elif text is not None:
             slack_message = {
                 "text": text
@@ -63,6 +74,8 @@ class SlackClient:
                 return False
 
     def Send_to_Slack(self, payload):
+        import requests
+
         try:
             request = requests.post(
                 url=self._uri,
